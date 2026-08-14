@@ -321,11 +321,46 @@ tg-video-dl-bot/
 
 | مشکل | راه‌حل |
 |---|---|
+| `Invalid value for '--port': '$PORT'` | **Start Command را خالی کنید** یا روی `python -m app.main` بگذارید. توضیح کامل پایین‌تر ↓ |
 | ربات جواب نمی‌دهد | لاگ Railway را ببینید؛ معمولاً `BASE_URL` اشتباه است یا دامنه ساخته نشده |
 | لینک ۴۰۴ می‌دهد | فایل روی سرورهای تلگرام حذف شده، یا `SECRET_KEY` تغییر کرده (لینک‌های قدیمی باطل می‌شوند) |
 | «فایل خیلی بزرگ است» | محدودیت ۲۰ مگابایتی Bot API — بخش فایل‌های بزرگ را ببینید |
 | بعد از دیپلوی لینک‌های `short` خراب شد | Volume وصل نشده؛ یا `LINK_MODE=signed` بگذارید |
 | در لاگ `Unauthorized` می‌بینید | `BOT_TOKEN` غلط است |
+
+### ❗️ خطای `Invalid value for '--port': '$PORT' is not a valid integer`
+
+**علت:** Railway دستور `Start Command` را بدون شل اجرا می‌کند. برای همین `$PORT` هیچ‌وقت باز نمی‌شود و رشتهٔ خامِ `$PORT` به uvicorn می‌رسد.
+
+**راه‌حل:** در این پروژه دستور اجرا `python -m app.main` است و پورت را **خودِ پایتون** از متغیر محیطی می‌خواند، پس این خطا رخ نمی‌دهد.
+
+اگر باز هم این خطا را می‌بینید یعنی Railway هنوز دستور قدیمی را نگه داشته است:
+
+۱. آخرین نسخه را push کنید:
+
+</div>
+
+```bash
+git add -A && git commit -m "fix: port handling" && git push
+```
+
+<div dir="rtl">
+
+۲. در Railway → سرویس → **Settings** → **Deploy** → فیلد **Custom Start Command** را پیدا کنید.
+اگر داخلش چیزی شبیه `uvicorn ... --port $PORT` نوشته شده، **آن را کاملاً پاک کنید** (تا از `railway.json` خوانده شود) یا دقیقاً بگذارید:
+
+</div>
+
+```
+python -m app.main
+```
+
+<div dir="rtl">
+
+۳. **Redeploy** بزنید.
+
+> ✅ اگر روزی خواستید حتماً از uvicorn مستقیم استفاده کنید، حتماً با شل اجرا کنید:
+> `sh -c "uvicorn app.main:app --host 0.0.0.0 --port $PORT"`
 
 ## 📄 لایسنس
 

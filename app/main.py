@@ -106,6 +106,12 @@ app = create_app()
 
 
 def main() -> None:
+    """اجرای سرور؛ پورت از متغیر محیطی PORT خوانده می‌شود.
+
+    هیچ وابستگی‌ای به باز شدن $PORT توسط شل ندارد، بنابراین روی Railway،
+    Render، Heroku و Docker به یک شکل کار می‌کند.
+    """
+    log.info("اجرای سرور روی %s:%s", settings.host, settings.port)
     uvicorn.run(
         "app.main:app",
         host=settings.host,

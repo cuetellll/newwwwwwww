@@ -68,6 +68,27 @@ class Settings(BaseSettings):
     def _parse_ids(cls, v):  # noqa: D102
         return _split_ids(v)
 
+    @field_validator("port", mode="before")
+    @classmethod
+    def _parse_port(cls, v):
+        """پورت را مقاوم می‌خواند.
+
+        بعضی پلتفرم‌ها (مثل Railway) اگر startCommand بدون شل اجرا شود، رشتهٔ
+        خامِ "$PORT" را پاس می‌دهند. در این حالت به‌جای کرش، پیش‌فرض ۸۰۸۰.
+        """
+        if v is None:
+            return 8080
+        if isinstance(v, int):
+            return v
+        text = str(v).strip().strip("\"'")
+        if not text or text.startswith("$") or "{" in text:
+            return 8080
+        try:
+            port = int(text)
+        except ValueError:
+            return 8080
+        return port if 1 <= port <= 65535 else 8080
+
     @field_validator("bot_lang", mode="before")
     @classmethod
     def _lang(cls, v):
